@@ -2,7 +2,7 @@ import csv,io,json,re,hashlib,pathlib,urllib.request,concurrent.futures,datetime
 import UnityPy
 UnityPy.config.FALLBACK_UNITY_VERSION='2022.3.21f1'
 ROOT=pathlib.Path(__file__).resolve().parents[1]/'site'
-BASE='https://carbonarrrrrrra.github.io/astrum-icons/'
+BASE='https://carbonarrrrrrra.github.io/loa-icons/'
 def get(url):
  with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Astrum-Icons'}),timeout=60) as r:return r.read()
 def main():

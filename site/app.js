@@ -1,4 +1,4 @@
-const ORIGIN='https://carbonarrrrrrra.github.io/astrum-icons';
+const ORIGIN='https://carbonarrrrrrra.github.io/loa-icons';
 const $=s=>document.querySelector(s);let groups=[],limit=48,toastTimer;const selected=new Map();
 const normalize=s=>s.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
 function toast(text){$('#toast').textContent=text;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2300)}
