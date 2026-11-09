@@ -1,25 +1,52 @@
-import csv,io,json,re,hashlib,pathlib,urllib.request,concurrent.futures,datetime
+import json,re,hashlib,pathlib,urllib.request,concurrent.futures,datetime,sqlite3,tempfile
 import UnityPy
 UnityPy.config.FALLBACK_UNITY_VERSION='2022.3.21f1'
 ROOT=pathlib.Path(__file__).resolve().parents[1]/'site'
 BASE='https://carbonarrrrrrra.github.io/loa-icons/'
 def get(url):
  with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Astrum-Icons'}),timeout=60) as r:return r.read()
+# Read the actual master database: the CSV mirror can lag behind this repository.
+REPOSITORY='Expugn/priconne-database'
+TABLE='v1_72eed14207272e0d9d1649016bfed38f55836b5903f391671de1b08c0ac21aaa'
+COLUMNS={
+ 'unit_id':'ba5a643a8b0133811bc78891ff90322b4fa23b060d546e448303e26302c77d16',
+ 'name':'06d2df380b921fbca33847d924e8a0535ea5c38f51859ce720f79226de362733',
+ 'kana':'602279b192e39c6df9c8e4c4300505be7f3e4aa64662bbad30069404da08c2d5',
+ 'start_time':'d59c8fd0b7288d852c99f54a233bb419846af505aae69fc12545a2744915c7e2',
+}
+def read_names(data):
+ with tempfile.NamedTemporaryFile(suffix='.db') as f:
+  f.write(data);f.flush()
+  with sqlite3.connect('file:'+f.name+'?mode=ro',uri=True) as db:
+   columns={r[1] for r in db.execute('PRAGMA table_info("'+TABLE+'")')}
+   if not set(COLUMNS.values()) <= columns:raise ValueError('Master schema changed; refusing to publish')
+   rows=db.execute('SELECT '+','.join('"'+c+'"' for c in COLUMNS.values())+' FROM "'+TABLE+'"').fetchall()
+ names={str(r[0])[:4]:dict(zip(COLUMNS,map(str,r))) for r in rows if re.fullmatch(r'1\d{5}',str(r[0]))}
+ if names.get('1001',{}).get('name')!='ヒヨリ' or len(names)<300:raise ValueError('Invalid unit master')
+ return names
+
+def load_master(old):
+ sha=json.loads(get('https://api.github.com/repos/'+REPOSITORY+'/commits/master'))['sha']
+ raw='https://raw.githubusercontent.com/'+REPOSITORY+'/'+sha+'/'
+ version=str(json.loads(get(raw+'version.json'))['JP']['version'])
+ if not re.fullmatch(r'\d{8}',version) or int(version)<int(old['version']):raise ValueError('Invalid or regressed JP version')
+ pointer=get(raw+'master_jp.db').decode()
+ digest=re.search(r'^oid sha256:([0-9a-f]{64})$',pointer,re.M)
+ size=re.search(r'^size (\d+)$',pointer,re.M)
+ if not digest or not size:raise ValueError('Invalid database LFS pointer')
+ digest=digest[1]
+ if old.get('database_sha256')==digest and old.get('master_names'):
+  names=old['master_names']
+ else:
+  data=get('https://media.githubusercontent.com/media/'+REPOSITORY+'/'+sha+'/master_jp.db')
+  if len(data)!=int(size[1]) or hashlib.sha256(data).hexdigest()!=digest:raise ValueError('Database checksum mismatch')
+  names=read_names(data)
+ return version,names,sha,digest
+
 def main():
  old=json.loads((ROOT/'catalog.json').read_text())
- sha=json.loads(get('https://api.github.com/repos/Expugn/priconne-diff/commits/master'))['sha']
- raw='https://raw.githubusercontent.com/Expugn/priconne-diff/'+sha+'/'
- version=json.loads(get(raw+'version.json'))
- print('Version metadata:',version)
- # Accept only a numeric JP version; schema changes must fail rather than publish stale data.
- v=version.get('JP') or version.get('jp')
- if isinstance(v,dict):v=v.get('TruthVersion') or v.get('version')
- v=str(v)
- if not re.fullmatch(r'\d{8}',v):raise ValueError('Unexpected version.json schema')
- table='JP/csv/v1_72eed14207272e0d9d1649016bfed38f55836b5903f391671de1b08c0ac21aaa.csv'
- rows=list(csv.reader(io.StringIO(get(raw+table).decode('utf-8-sig'))))[1:]
- names={r[17][:4]:dict(unit_id=r[17],name=r[21],kana=r[13],start_time=r[2]) for r in rows if len(r)>21 and re.fullmatch(r'1\d{5}',r[17])}
- assert names.get('1001',{}).get('name')=='ヒヨリ','Master schema changed'
+ v,names,sha,digest=load_master(old)
+ print('Master database version:',v,'commit:',sha)
  manifest=get('https://prd-priconne-redive.akamaized.net/dl/Resources/'+v+'/Jpn/AssetBundles/iOS/manifest/unit2_assetmanifest').decode()
  items=re.findall(r'^a/unit_icon_unit_(1\d{5})\.unity3d,([^,]+),([^,]+),[^,]*,(\d+)',manifest,re.M)
  assert len(items)>=len(old['records'])*.9,'Unexpectedly incomplete manifest'
@@ -38,10 +65,10 @@ def main():
  with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:records=list(pool.map(extract,items))
  records.sort(key=lambda r:(r['unit_id'],r['id']),reverse=True)
  changed=records!=old['records'] or old['version']!=v
- result=dict(old,records=records,version=v,characters=len({r['unit_id'] for r in records}),images=len(records))
+ result=dict(old,records=records,version=v,characters=len({r['unit_id'] for r in records}),images=len(records),database_sha256=digest,master_names=names)
  if changed:result['updated']=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
  (ROOT/'catalog.json').write_text(json.dumps(result,ensure_ascii=False))
- source=dict(version=v,extracted_on=result['updated'],images=len(records),units=result['characters'],scope=result['scope'],manifest='https://prd-priconne-redive.akamaized.net/dl/Resources/'+v+'/Jpn/AssetBundles/iOS/manifest/unit2_assetmanifest',names='https://github.com/Expugn/priconne-diff/tree/'+sha+'/JP/csv',format='WebP lossless',checks='Source bundle sizes and MD5 validated before extraction.',automatic_updates=True)
+ source=dict(version=v,extracted_on=result['updated'],images=len(records),units=result['characters'],scope=result['scope'],manifest='https://prd-priconne-redive.akamaized.net/dl/Resources/'+v+'/Jpn/AssetBundles/iOS/manifest/unit2_assetmanifest',names='https://github.com/'+REPOSITORY+'/tree/'+sha,database_sha256=digest,format='WebP lossless',checks='Master database SHA256 and bundle sizes/MD5 validated before extraction.',automatic_updates=True)
  (ROOT/'source.json').write_text(json.dumps(source,ensure_ascii=False,indent=2))
  print('Validated',len(records),'icons; changed:',changed)
 if __name__=='__main__':main()
