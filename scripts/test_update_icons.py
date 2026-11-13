@@ -1,9 +1,16 @@
 import hashlib,json,sqlite3,tempfile,unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import update_icons as sync
 
 class MasterTests(unittest.TestCase):
+ def test_credentials_only_sent_to_github_api(self):
+  with patch.dict(sync.os.environ,{'GITHUB_TOKEN':'test-only-token'}),patch.object(sync.urllib.request,'urlopen') as opened:
+   opened.return_value.__enter__.return_value.read.return_value=b'ok'
+   for host,authorized in [('api.github.com',True),('raw.githubusercontent.com',False),('prd-priconne-redive.akamaized.net',False),('api.github.com.example.org',False)]:
+    sync.get('https://'+host+'/example')
+    request=opened.call_args.args[0]
+    self.assertEqual(request.get_header('Authorization'),'Bearer test-only-token' if authorized else None)
  def test_named_columns_ignore_physical_order(self):
   with tempfile.NamedTemporaryFile() as f:
    with sqlite3.connect(f.name) as db:

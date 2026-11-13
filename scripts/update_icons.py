@@ -1,10 +1,14 @@
-import json,re,hashlib,pathlib,urllib.request,concurrent.futures,datetime,sqlite3,tempfile
+import json,re,hashlib,pathlib,urllib.request,concurrent.futures,datetime,sqlite3,tempfile,os,urllib.parse
 import UnityPy
 UnityPy.config.FALLBACK_UNITY_VERSION='2022.3.21f1'
 ROOT=pathlib.Path(__file__).resolve().parents[1]/'site'
 BASE='https://carbonarrrrrrra.github.io/loa-icons/'
 def get(url):
- with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Astrum-Icons'}),timeout=60) as r:return r.read()
+ headers={'User-Agent':'LoA-Icons'}
+ # Only send the ephemeral Actions credential to GitHub's API, never asset hosts.
+ if urllib.parse.urlsplit(url).hostname=='api.github.com' and os.environ.get('GITHUB_TOKEN'):
+  headers['Authorization']='Bearer '+os.environ['GITHUB_TOKEN']
+ with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=60) as r:return r.read()
 # Read the actual master database: the CSV mirror can lag behind this repository.
 REPOSITORY='Expugn/priconne-database'
 TABLE='v1_72eed14207272e0d9d1649016bfed38f55836b5903f391671de1b08c0ac21aaa'
