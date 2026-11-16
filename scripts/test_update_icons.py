@@ -22,6 +22,14 @@ class MasterTests(unittest.TestCase):
    names=sync.read_names(Path(f.name).read_bytes())
    self.assertEqual(names['1001']['name'],'ヒヨリ')
    self.assertEqual(names['1001']['unit_id'],'100101')
+ def test_rotated_schema_uses_primary_key_and_correct_name(self):
+  table,mapping=sync.SCHEMAS[1]
+  with patch.object(sync,'TABLE',table),patch.object(sync,'COLUMNS',mapping):
+   self.test_named_columns_ignore_physical_order()
+ def test_unknown_schema_fails_closed(self):
+  with tempfile.NamedTemporaryFile() as f:
+   with sqlite3.connect(f.name) as db:db.execute('CREATE TABLE unrelated(id INTEGER)')
+   with self.assertRaisesRegex(ValueError,'schema changed'):sync.read_names(Path(f.name).read_bytes())
  def fake_get(self,url):
   if url.endswith('/commits/master'): return b'{"sha":"abc"}'
   if url.endswith('/version.json'): return b'{"JP":{"version":10071410}}'

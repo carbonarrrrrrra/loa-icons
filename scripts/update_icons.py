@@ -18,13 +18,23 @@ COLUMNS={
  'kana':'602279b192e39c6df9c8e4c4300505be7f3e4aa64662bbad30069404da08c2d5',
  'start_time':'d59c8fd0b7288d852c99f54a233bb419846af505aae69fc12545a2744915c7e2',
 }
+# JP 10071600 rotates the obfuscated table/column identifiers.
+SCHEMAS=[(TABLE,COLUMNS),(
+ 'v1_bbc4b012ab5d83ce83b76cd2a1474b8fe57a28552ca1150e7e07bb3d975edf46',{
+ 'unit_id':'0a4137910477205ef40bf70a716fc15d522c63a82d90567b580b2db85b0fa38e',
+ 'name':'43597e0b06461658b444faf9e7ee0c9e05ece6862329e96530e72b33bfb00618',
+ 'kana':'27dc13bdd02054923c9474aa5ba2fc3b5ca0386a61b1607f210bbcddb2dcd652',
+ 'start_time':'5ac417fe6174282303feb5db469103d7701207e8f35dad9a511cc2ca3bc41fea',
+ })]
 def read_names(data):
  with tempfile.NamedTemporaryFile(suffix='.db') as f:
   f.write(data);f.flush()
   with sqlite3.connect('file:'+f.name+'?mode=ro',uri=True) as db:
-   columns={r[1] for r in db.execute('PRAGMA table_info("'+TABLE+'")')}
-   if not set(COLUMNS.values()) <= columns:raise ValueError('Master schema changed; refusing to publish')
-   rows=db.execute('SELECT '+','.join('"'+c+'"' for c in COLUMNS.values())+' FROM "'+TABLE+'"').fetchall()
+   for table,mapping in SCHEMAS:
+    columns={r[1] for r in db.execute('PRAGMA table_info("'+table+'")')}
+    if set(mapping.values()) <= columns:break
+   else:raise ValueError('Master schema changed; refusing to publish')
+   rows=db.execute('SELECT '+','.join('"'+c+'"' for c in mapping.values())+' FROM "'+table+'"').fetchall()
  names={str(r[0])[:4]:dict(zip(COLUMNS,map(str,r))) for r in rows if re.fullmatch(r'1\d{5}',str(r[0]))}
  if names.get('1001',{}).get('name')!='ヒヨリ' or len(names)<300:raise ValueError('Invalid unit master')
  return names
