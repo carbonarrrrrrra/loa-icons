@@ -37,9 +37,23 @@ def read_names(data):
     if set(mapping.values()) <= columns:break
    else:raise ValueError('Master schema changed; refusing to publish')
    rows=db.execute('SELECT '+','.join('"'+c+'"' for c in mapping.values())+' FROM "'+table+'"').fetchall()
+   elements={}
+   element_table='v1_eb33b47a869d14b7e281d54c7e9a1a93107cc04038c621fc07a5c1f1eaa7d412'
+   if db.execute("SELECT 1 FROM sqlite_master WHERE name=?",(element_table,)).fetchone():
+    for element,uid in db.execute('SELECT "560414518d0432ee2126b022c21302c6548879f8d4c9e898f14782d6684df4a5","b351278748a82c7a9c43643865ab2a86964d1a5516ecd05b4dea7bab8dfc156b" FROM '+element_table):
+     if element not in range(1,6):raise ValueError('Invalid element')
+     elements[str(uid)]=element
+   descriptions={}
+   desc_col='403462ba842d23b5222c07e82daa98dbf4ce518eb330ecc160c90821bc05d809' if table==SCHEMAS[1][0] else '3cdff1e5a9f652e2a0f98aa6e1b4346343587d42ddef5ce97fe409a6deffa47c'
+   if desc_col in columns:
+    descriptions={str(uid):desc for uid,desc in db.execute('SELECT "'+mapping['unit_id']+'","'+desc_col+'" FROM "'+table+'"')}
+
  names={str(r[0])[:4]:dict(zip(COLUMNS,map(str,r))) for r in rows if re.fullmatch(r'1\d{5}',str(r[0]))}
  for name in names.values():
   name['position']=int(name['position'])
+  name['element']=elements.get(name['unit_id'])
+  desc=descriptions.get(name['unit_id'],'')
+  name['attack']='物理' if desc.startswith('【物理】') else '魔法' if desc.startswith('【魔法】') else ''
   if not 0<=name['position']<=10000:raise ValueError('Invalid formation position')
  if names.get('1001',{}).get('name')!='ヒヨリ' or len(names)<300:raise ValueError('Invalid unit master')
  return names
@@ -54,7 +68,7 @@ def load_master(old):
  size=re.search(r'^size (\d+)$',pointer,re.M)
  if not digest or not size:raise ValueError('Invalid database LFS pointer')
  digest=digest[1]
- if old.get('database_sha256')==digest and old.get('master_names') and all('position' in r for r in old['master_names'].values()):
+ if old.get('database_sha256')==digest and old.get('master_names') and all('element' in r and 'attack' in r and 'position' in r for r in old['master_names'].values()):
   names=old['master_names']
  else:
   data=get('https://media.githubusercontent.com/media/'+REPOSITORY+'/'+sha+'/master_jp.db')
@@ -65,6 +79,10 @@ def load_master(old):
 def main():
  old=json.loads((ROOT/'catalog.json').read_text())
  v,names,sha,digest=load_master(old)
+ # A rotated attribute schema must not silently empty the checker filters.
+ if sum(r.get('element') in range(1,6) for r in names.values())<300 or sum(r.get('attack') in ('物理','魔法') for r in names.values())<300:
+  raise ValueError('Incomplete character attributes; refusing to publish')
+ names['1073']=dict(unit_id='107301',name='ラジラジ',kana='らじらじ',start_time='',position=None,element=None,attack='')
  print('Master database version:',v,'commit:',sha)
  manifest=get('https://prd-priconne-redive.akamaized.net/dl/Resources/'+v+'/Jpn/AssetBundles/iOS/manifest/unit2_assetmanifest').decode()
  items=re.findall(r'^a/unit_icon_unit_(1\d{5})\.unity3d,([^,]+),([^,]+),[^,]*,(\d+)',manifest,re.M)

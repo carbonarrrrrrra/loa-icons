@@ -42,7 +42,7 @@ class MasterTests(unittest.TestCase):
   with patch.object(sync,'get',self.fake_get),self.assertRaisesRegex(ValueError,'checksum'):
    sync.load_master({'version':'10071310'})
  def test_same_digest_reuses_complete_names(self):
-  names={'1411':{'name':'アーモンドアイ','unit_id':'141101','position':261}}
+  names={'1411':{'name':'アーモンドアイ','unit_id':'141101','position':261,'element':4,'attack':'物理'}}
   with patch.object(sync,'get',self.fake_get):
    result=sync.load_master({'version':'10071410','database_sha256':hashlib.sha256(b'data').hexdigest(),'master_names':names})
   self.assertEqual(result[1],names)
