@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict');
+const {formationCompare,formationExceptions}=require('../site/formation.js');
+const catalog=require('../site/catalog.json');
+const groups=[...new Map(catalog.records.map(r=>[r.unit_id,{id:r.unit_id,name:r.name,position:r.position}])).values()];
+const sorted=[...groups].sort(formationCompare);
+assert.deepEqual(sorted.slice(-formationExceptions.flat().length).map(g=>g.id),formationExceptions.flat());
+assert.deepEqual([...groups].sort((a,b)=>formationCompare(a,b,true)).slice(-formationExceptions.flat().length).map(g=>g.id),formationExceptions.flat());
+const twins=[{id:'150001',position:261},{id:'141101',position:261},{id:'149901',position:261}];
+assert.deepEqual(twins.sort(formationCompare).map(g=>g.id),['141101','149901','150001']);
+assert.equal(sorted.find(g=>g.id==='100101').position,200);
+assert.equal(sorted.find(g=>g.id==='100201').position,800);
+assert.deepEqual(sorted.filter(g=>g.position===732&&!formationExceptions.flat().includes(g.id)).map(g=>g.id),['136001','180701']);
+assert.ok(sorted.findIndex(g=>g.id==='105701')<sorted.findIndex(g=>g.id==='170101'));
+assert.ok(formationCompare({id:'1',position:100},{id:'2',position:null})<0);
+console.log('PASS: formation, new tied IDs, both direction exception tails, combined portraits, unknown positions');

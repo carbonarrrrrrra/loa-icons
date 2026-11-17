@@ -16,6 +16,7 @@ COLUMNS={
  'unit_id':'ba5a643a8b0133811bc78891ff90322b4fa23b060d546e448303e26302c77d16',
  'name':'06d2df380b921fbca33847d924e8a0535ea5c38f51859ce720f79226de362733',
  'kana':'602279b192e39c6df9c8e4c4300505be7f3e4aa64662bbad30069404da08c2d5',
+ 'position':'3ffb995b530712e803db6de2b8d510dbfe9eedca2e8ca767d484aecb4ac60a90',
  'start_time':'d59c8fd0b7288d852c99f54a233bb419846af505aae69fc12545a2744915c7e2',
 }
 # JP 10071600 rotates the obfuscated table/column identifiers.
@@ -24,6 +25,7 @@ SCHEMAS=[(TABLE,COLUMNS),(
  'unit_id':'0a4137910477205ef40bf70a716fc15d522c63a82d90567b580b2db85b0fa38e',
  'name':'43597e0b06461658b444faf9e7ee0c9e05ece6862329e96530e72b33bfb00618',
  'kana':'27dc13bdd02054923c9474aa5ba2fc3b5ca0386a61b1607f210bbcddb2dcd652',
+ 'position':'f15733495bdefa6ab7c59199c30a34bc6a84af0f550001e5dffda5e18e3d2aac',
  'start_time':'5ac417fe6174282303feb5db469103d7701207e8f35dad9a511cc2ca3bc41fea',
  })]
 def read_names(data):
@@ -36,6 +38,9 @@ def read_names(data):
    else:raise ValueError('Master schema changed; refusing to publish')
    rows=db.execute('SELECT '+','.join('"'+c+'"' for c in mapping.values())+' FROM "'+table+'"').fetchall()
  names={str(r[0])[:4]:dict(zip(COLUMNS,map(str,r))) for r in rows if re.fullmatch(r'1\d{5}',str(r[0]))}
+ for name in names.values():
+  name['position']=int(name['position'])
+  if not 0<=name['position']<=10000:raise ValueError('Invalid formation position')
  if names.get('1001',{}).get('name')!='ヒヨリ' or len(names)<300:raise ValueError('Invalid unit master')
  return names
 
@@ -49,7 +54,7 @@ def load_master(old):
  size=re.search(r'^size (\d+)$',pointer,re.M)
  if not digest or not size:raise ValueError('Invalid database LFS pointer')
  digest=digest[1]
- if old.get('database_sha256')==digest and old.get('master_names'):
+ if old.get('database_sha256')==digest and old.get('master_names') and all('position' in r for r in old['master_names'].values()):
   names=old['master_names']
  else:
   data=get('https://media.githubusercontent.com/media/'+REPOSITORY+'/'+sha+'/master_jp.db')
@@ -75,7 +80,7 @@ def main():
    images=[o.image for o in images if o.m_Name=='icon_unit_'+uid]
    assert len(images)==1
    images[0].save(dst,'WEBP',lossless=True)
-  return dict(id=uid,**names.get(uid[:4],dict(unit_id=uid[:4]+'01',name='名前未登録',kana='',start_time='')),variant=uid[-2:],url='icons/'+uid+'.webp',width=128,height=128,md5=md5,bundle_path=path)
+  return dict(id=uid,**names.get(uid[:4],dict(unit_id=uid[:4]+'01',name='名前未登録',kana='',start_time='',position=None)),variant=uid[-2:],url='icons/'+uid+'.webp',width=128,height=128,md5=md5,bundle_path=path)
  with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:records=list(pool.map(extract,items))
  records.sort(key=lambda r:(r['unit_id'],r['id']),reverse=True)
  changed=records!=old['records'] or old['version']!=v

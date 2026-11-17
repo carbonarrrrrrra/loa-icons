@@ -28,6 +28,7 @@ jobs:
       - run: python scripts/update_icons.py
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - run: node scripts/test_formation.cjs
       - name: Save updated catalog
         run: |
           git config user.name 'Astrum Icons Bot'
