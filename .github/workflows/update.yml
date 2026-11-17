@@ -30,6 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - run: node scripts/test_formation.cjs
       - run: node scripts/test_tools.cjs
+      - run: node scripts/test_share.cjs
       - name: Save updated catalog
         run: |
           git config user.name 'Astrum Icons Bot'
