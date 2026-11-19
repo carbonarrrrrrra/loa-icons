@@ -1,0 +1,332 @@
+[
+  {
+    "id": "fire-physical",
+    "name": "火属性編成",
+    "element": "火",
+    "type": "物理",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "131101"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "109101"
+      },
+      {
+        "cr": 6,
+        "sp": true,
+        "id": "108101"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "116701"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "129701"
+      }
+    ]
+  },
+  {
+    "id": "fire-magic",
+    "name": "火魔法編成",
+    "element": "火",
+    "type": "魔法",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "127701"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "127801"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "132801"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "110601"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "127201"
+      }
+    ]
+  },
+  {
+    "id": "water-physical",
+    "name": "水物理編成",
+    "element": "水",
+    "type": "物理",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "105601"
+      },
+      {
+        "cr": 6,
+        "sp": true,
+        "id": "107901"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "181201"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "122001"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "129301"
+      }
+    ]
+  },
+  {
+    "id": "water-magic",
+    "name": "水魔法編成",
+    "element": "水",
+    "type": "魔法",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "126601"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "115701"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "131701"
+      },
+      {
+        "cr": 6,
+        "sp": true,
+        "id": "107701"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "122701"
+      }
+    ]
+  },
+  {
+    "id": "wind-physical",
+    "name": "風物理編成",
+    "element": "風",
+    "type": "物理",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "130101"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "103801"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "125401"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "125301"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "116401"
+      }
+    ]
+  },
+  {
+    "id": "wind-magic",
+    "name": "風魔法編成",
+    "element": "風",
+    "type": "魔法",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "129601"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "130801"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "130701"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "126201"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "134401"
+      }
+    ]
+  },
+  {
+    "id": "light-physical",
+    "name": "光物理編成",
+    "element": "光",
+    "type": "物理",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "124201"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "124801"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "106801"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "124601"
+      },
+      {
+        "cr": 6,
+        "sp": true,
+        "id": "101601"
+      }
+    ]
+  },
+  {
+    "id": "light-magic",
+    "name": "光魔法編成",
+    "element": "光",
+    "type": "魔法",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "130901"
+      },
+      {
+        "cr": 6,
+        "sp": true,
+        "id": "109201"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "131001"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "126501"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "128401"
+      }
+    ]
+  },
+  {
+    "id": "dark-physical",
+    "name": "闇物理編成",
+    "element": "闇",
+    "type": "物理",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "113901"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "133001"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "125601"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "129901"
+      },
+      {
+        "cr": 6,
+        "sp": true,
+        "id": "105101"
+      }
+    ]
+  },
+  {
+    "id": "dark-magic",
+    "name": "闇魔法編成",
+    "element": "闇",
+    "type": "魔法",
+    "members": [
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "119101"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "125501"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "122301"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "131801"
+      },
+      {
+        "cr": 6,
+        "sp": false,
+        "id": "129001"
+      }
+    ]
+  }
+]

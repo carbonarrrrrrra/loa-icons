@@ -37,7 +37,18 @@ const LoaShare = (() => {
         for (const id of units) { if (assigned.has(id)) fail(); assigned.add(id); }
         return {id: 'tier-' + i, name: r[0], color: r[1], units};
       })};
-    } else data = subset(p.o);
+    } else {
+      data = subset(p.o);
+      if (p.training) {
+        const ids = new Set(data);
+        for (const [id, pair] of Object.entries(p.training)) {
+          if (!ids.has(id) || !Array.isArray(pair) || pair.length !== 2 ||
+              !(pair[0] === null || Number.isInteger(pair[0]) && pair[0]>=0 && pair[0]<=15) ||
+              !(pair[1] === null || typeof pair[1] === 'boolean')) fail();
+        }
+        data = {ids:data, training:p.training};
+      }
+    }
     const f = p.f;
     if (!Array.isArray(f) || f.length !== 6 || typeof f[0] !== 'string' || f[0].length > 200 || !['name', 'formation', 'id-desc'].includes(f[1]) || !['all', 'yes', 'no'].includes(f[2]) || !['all', '物理', '魔法'].includes(f[3]) || !Number.isInteger(f[4]) || f[4] < 0 || f[4] > 5 || typeof f[5] !== 'boolean') fail();
     return {kind: p.k, data, roster, view: {search: f[0], sort: f[1], owned: p.k === 'tier' ? 'all' : f[2], attack: f[3], element: f[4], special: f[5]}};
@@ -46,7 +57,10 @@ const LoaShare = (() => {
     const sorted = ids => [...ids].map(String).sort((a,b)=>Number(a)-Number(b));
     const p = {v: 1, k: kind, c: packIds(sorted(roster)), f: [view.search, view.sort, kind === 'tier' ? 'all' : view.owned, view.attack, view.element, view.special]};
     if (kind === 'tier') { p.t = data.title; p.r = data.rows.map(r => [r.name, r.color, packIds(r.units)]); }
-    else p.o = packIds(sorted(data));
+    else {
+      p.o = packIds(sorted(Array.isArray(data) ? data : data.ids));
+      if (data.training) p.training = data.training;
+    }
     validate(p); return p;
   }
   function base64(bytes) {
