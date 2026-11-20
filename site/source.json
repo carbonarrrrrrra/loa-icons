@@ -1,12 +1,12 @@
 {
-  "version": "10071600",
-  "extracted_on": "2026-11-17",
+  "version": "10071700",
+  "extracted_on": "2026-11-20",
   "images": 817,
   "units": 376,
   "scope": "JP素材一覧のunit_icon_unit_1xxxxx全件。衣装違い・NPC・特殊ユニットを含む。",
-  "manifest": "https://prd-priconne-redive.akamaized.net/dl/Resources/10071600/Jpn/AssetBundles/iOS/manifest/unit2_assetmanifest",
-  "names": "https://github.com/Expugn/priconne-database/tree/dcadb7c85a6bfb59752ce88a3be77cc632dcccbd",
-  "database_sha256": "6c474f9878dfe62a3a883b11eb8c73a34c2d40f0ac83511bed11577006b62355",
+  "manifest": "https://prd-priconne-redive.akamaized.net/dl/Resources/10071700/Jpn/AssetBundles/iOS/manifest/unit2_assetmanifest",
+  "names": "https://github.com/Expugn/priconne-database/tree/307c16b9d77403ed70255a8c18e55ec55f00aeef",
+  "database_sha256": "c3bef07557d2a1daa9ac34bf9af306a6a1a7d8fa149b52416a9545b46b5f9b85",
   "format": "WebP lossless",
   "checks": "Master database SHA256 and bundle sizes/MD5 validated before extraction.",
   "automatic_updates": true
