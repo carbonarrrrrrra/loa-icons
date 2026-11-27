@@ -5,7 +5,7 @@
   "units": 376,
   "scope": "JP素材一覧のunit_icon_unit_1xxxxx全件。衣装違い・NPC・特殊ユニットを含む。",
   "manifest": "https://prd-priconne-redive.akamaized.net/dl/Resources/10071700/Jpn/AssetBundles/iOS/manifest/unit2_assetmanifest",
-  "names": "https://github.com/Expugn/priconne-database/tree/fd582994a6a2de1a865228844ddcfa3807f7fa36",
+  "names": "https://github.com/Expugn/priconne-database/tree/126a962171afece29a6e6d8da85aca5d61cb5d0a",
   "database_sha256": "c3bef07557d2a1daa9ac34bf9af306a6a1a7d8fa149b52416a9545b46b5f9b85",
   "format": "WebP lossless",
   "checks": "Master database SHA256 and bundle sizes/MD5 validated before extraction.",
